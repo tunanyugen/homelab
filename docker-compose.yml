@@ -1,0 +1,94 @@
+services:
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/heimdall/config:/config
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+  wireguard:
+    image: lscr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SERVERURL=${SERVER_URL} #optional
+      - SERVERPORT=51820 #optional
+      - PEERS=${PEERS} #optional
+      - INTERNAL_SUBNET=10.13.13.0 #optional
+      - ALLOWEDIPS=0.0.0.0/0 #optional
+      - PERSISTENTKEEPALIVE_PEERS= #optional
+      - LOG_CONFS=true #optional
+    volumes:
+      - ./data/wireguard/config:/config
+      - ./data/wireguard/lib/modules:/lib/modules #optional
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+  emulatorjs:
+    image: lscr.io/linuxserver/emulatorjs:latest
+    container_name: emulatorjs
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SUBFOLDER=/ #optional
+    volumes:
+      - ./data/emulatorjs/config:/config
+      - ./data/emulatorjs/data:/data
+    ports:
+      - 3000:3000
+      - 3001:80
+      - 3002:4001 #optional
+    restart: unless-stopped
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - JELLYFIN_PublishedServerUrl=http://192.168.0.5 #optional
+    volumes:
+      - ./data/jellyfin/library:/config
+      - ./data/jellyfin/tvseries:/data/tvshows
+      - ./data/jellyfin/movies:/data/movies
+    ports:
+      - 3003:8096
+      - 3004:8920 #optional
+      - 3005:7359/udp #optional
+      - 3006:1900/udp #optional
+    restart: unless-stopped
+  kdenlive:
+    image: lscr.io/linuxserver/kdenlive:latest
+    container_name: kdenlive
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - CUSTOM_USER=${USER}
+      - PASSWORD=${PASSWORD}
+      - SUBFOLDER=/ #optional
+    volumes:
+      - ./data/kdenlive/config:/config
+    ports:
+      - 3007:3000
+      - 3008:3001
+    devices:
+      - /dev/dri:/dev/dri #optional
+    shm_size: "1gb" #optional
+    restart: unless-stopped
