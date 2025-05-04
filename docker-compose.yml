@@ -37,22 +37,6 @@ services:
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
-  emulatorjs:
-    image: lscr.io/linuxserver/emulatorjs:latest
-    container_name: emulatorjs
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SUBFOLDER=/ #optional
-    volumes:
-      - ./data/emulatorjs/config:/config
-      - ./data/emulatorjs/data:/data
-    ports:
-      - 3000:3000
-      - 3001:80
-      - 3002:4001 #optional
-    restart: unless-stopped
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
