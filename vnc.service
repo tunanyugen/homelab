@@ -1,0 +1,6 @@
+[Service]
+User=debian
+Restart=always
+ExecStart=/home/debian/homelab/vnc.sh
+[Install]
+WantedBy=multi-user.target
